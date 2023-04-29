@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <!-- Link css file -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Leaflet CSS file -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
+    crossorigin=""/>
+    
+    <!-- Leaflet JS File -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
+    crossorigin=""></script>
+    
+
+</head>
+<body>
+    
+    <h1>Tailored Travel</h1>
+    
+    <input type="radio" id="coffee" name="mapvalue" value="coffee">
+    <label for="coffee">Coffee</label>
+    
+    <input type="radio" id="restaurants" name="mapvalue" value="restaurants">
+    <label for="restaurants">Restaurants</label>
+    
+    <input type="radio" id="hotels" name="mapvalue" value="hotels">
+    <label for="hotels">Hotels</label>
+    
+    <input type="radio" id="markets" name="mapvalue" value="markets">
+    <label for="markets">Markets</label>
+    
+    <div id="map" style="width: 600px; height: 400px;"></div>
+    
+    <!-- ========= -->
+    
+    <button onclick="getLocation()">Try It</button>
+    <p id="demo"></p>
+    
+<!-- Link js file  -->
+<script src="index.js"></script>
+
+</body>
+</html>

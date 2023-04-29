@@ -1,0 +1,10 @@
+#map { height: 180px; }
+
+#map::before{
+    content: 'LOADING';
+    font-size: 4em;
+    text-align: center;
+    width: 100%;
+    position: absolute;
+    margin-top: 4em;
+}
