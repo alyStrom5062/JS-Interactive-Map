@@ -4,37 +4,55 @@ console.log("Silly")
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-// Set up Leaflet API / Map Init
+// Set up Map Object
 
-const mymap = {
+const myMap = {
+	coordinates: [],
+	businesses: [],
+	map: {},
+	markers: {},
 
-    coordinates: [],
-    businesses: [],
-    map: {},
-    markers: {},
-
-    buildMap() {
-        this.map = L.map('map', {
+	buildMap() {
+		this.map = L.map("map", {
             center: this.coordinates,
             zoom: 11,
-        });
-            
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(map);
+		});
 
-        const marker = L.marker(this.coordinates)
-        marker.addTo(this.map).bindPopup("<p1><b>You are here</b><br></p1>").openPopup
-    },
+		L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            minZoom: "15",
+		}).addTo(this.map)
 
-    addMarkers() {
-        for (let i = 0; i < this.businesses.length; i++) {
-            this.markers = L.marker([this.businesses[i].lat, this.businesses[i].long])
-            .bindPopup("<p1>" + this.businesses[i].name + "</p1>").addTo(this.map)
-        }
-    }
+		const marker = L.marker(this.coordinates)
+		marker.addTo(this.map).bindPopup("<p1><b>You are here</b><br></p1>").openPopup()
+	},
+
+	addMarkers() {
+		for (let i = 0; i < this.businesses.length; i++) {
+		this.markers = L.marker([
+            this.businesses[i].lat, 
+            this.businesses[i].long,
+		    ]).bindPopup(`<p1>${this.businesses[i].name}</p1>`).addTo(this.map)
+		}
+	},
 }
+
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+// Obtain User Location
+
+async function getCoords(){
+	const pos = await new Promise((resolve, reject) => {
+		navigator.geolocation.getCurrentPosition(resolve, reject)
+	});
+	return [pos.coords.latitude, pos.coords.longitude]
+}
+
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+// Set up Foursquare API
 
 async function getFoursquare(business) {
     const options = {
@@ -47,51 +65,55 @@ async function getFoursquare(business) {
     let limit = 5
     let lat = myMap.coordinates[0]
     let lon = myMap.coordinates[1]
-    let response = await fetch(`https://api.foursquare.com/v3/places/search?&query=${business}&limit=${limit}&ll=${lat}%2C${lon}`, options)
+    let response = await fetch(`https://cors-anywhere.herokuapp.com/https://api.foursquare.com/v3/places/search?&query=${business}&limit=${limit}&ll=${lat}%2C${lon}`, options)
     let data = await response.text()
     let parsedData = JSON.parse(data)
     let businesses  = parsedData.results
     return businesses
 }
 
-
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
-// Obtain User Location
+// Set add selected Foursquare Information
 
-async function getLocation() {
-
-  if (navigator.geolocation) {
-    const position = await new Promise((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
-    });
-    let latitude = position.coords.latitude
-    let longitude = position.coords.longitude;
-    console.log(latitude, longitude)
-    return [latitude, longitude]
-  }
-
+function processBusinesses(data) {
+	let businesses = data.map((element) => {
+		let location = {
+			name: element.name,
+			lat: element.geocodes.main.latitude,
+			long: element.geocodes.main.longitude
+		};
+		return location
+	})
+	return businesses
 }
 
-getLocation()
+// ==========================================================================================
+// ==========================================================================================
+// ==========================================================================================
+// Load Map Window
 
+window.onload = async () => {
+	const coords = await getCoords()
+	myMap.coordinates = coords
+	myMap.buildMap()
+}
 
 // ==========================================================================================
 // ==========================================================================================
 // ==========================================================================================
+// Business Form Submit
 
-// Set up Foursquare API
-
-
-
-
-
-
+document.getElementById("submit").addEventListener("click", async (event) => {
+	event.preventDefault()
+	let business = document.getElementById("business").value
+	let data = await getFoursquare(business)
+	myMap.businesses = processBusinesses(data)
+	myMap.addMarkers()
+})
 
 // add user location
-
-L.marker([51.505, -0.09]).addTo(map);
 
 // get selected location from the user
 
